@@ -1,0 +1,13 @@
+# Competition data: Kaggle rules forbid redistributing it.
+data
+data/
+*.parquet
+*.zip
+
+# Large generated artefacts
+outputs/
+*.npy
+*.pt
+*.ckpt
+.ipynb_checkpoints/
+__pycache__/
