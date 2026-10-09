@@ -40,11 +40,21 @@ Full report: [reports/eda.md](reports/eda.md) (regenerate with `python src/eda.p
 
 | Stage | What | Status |
 |---|---|---|
-| 0 | Accept rules, download data, EDA (library mix, adducts, CE, overlap of train structures with test class 1) | pending |
-| 1 | Baseline: cosine library match against train spectra, per-molecule aggregation, MRR@25 validation split by structure | pending |
+| 0 | Accept rules, download data, EDA | done ([reports/eda.md](reports/eda.md)) |
+| 1 | Baseline: mass-window candidates + cosine library match, mean of best match per query spectrum | done: **0.916** MRR@25 on a class-1-like validation (1,836 molecules, top-1 0.878, recall@25 0.984) |
 | 2 | Fingerprint / embedding model + candidate retrieval from public structure databases (offline, as a Kaggle dataset) | pending |
 | 3 | Formula-constrained de novo generation for class 3 | pending |
 | 4 | Ensemble and re-rank, two final picks | pending |
+
+## Baseline (class 1 only)
+
+[src/baseline.py](src/baseline.py): neutral mass from precursor m/z and adduct, candidates = train structures within 5 ppm,
+rank by the mean over query spectra of the best cosine (sqrt intensities, 0.01 Da bins) to any library spectrum of the candidate.
+Validation picks structures seen in at least two libraries, uses one library's spectra as queries and removes them from the reference.
+
+- The 5 ppm window holds the true structure 98.8 % of the time with a median of 12 candidates, so **mass alone prunes hard**.
+- This validation is optimistic for the hidden test: queries there are timsTOF spectra against mostly other instruments, and classes 2 and 3 have no library spectra at all.
+- Next: measure cross-instrument gain (train only on `enveda-*` queries), then fingerprint models for classes 2 and 3.
 
 ## Layout
 
