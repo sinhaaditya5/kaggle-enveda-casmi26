@@ -25,6 +25,17 @@ so the pipeline is likely three parts:
 
 Formula is strongly constrained by the precursor m/z and adduct, which prunes any candidate list hard.
 
+## Key findings from EDA
+
+Full report: [reports/eda.md](reports/eda.md) (regenerate with `python src/eda.py`).
+
+- **Train is 2.54 M spectra / 275,810 structures** (median 6 spectra per structure). It has **no `molecule_id`/`spectrum_id`**, so group by `inchikey14`.
+- **Instrument-matched data is only `enveda-180` + `enveda-np-examples`** (1.15 M spectra, 183 k structures); the rest is Orbitrap/QTOF from other labs.
+- **Test adducts are 7 of 26+ train adducts** (84.7 % of train spectra share a test adduct). The local test sample is 79 % `[M+H]+`, 16 % `[M-H]-`.
+- **Collision energies**: test is single-CE (75 %) or 3-CE merged (25 %); train also has 337 k spectra with no CE at all.
+- **Precursor error is dirty**: median 1.5 ppm but the 99th percentile is ~2,900 ppm, so filter train on `precursor_error_ppm`.
+- **The local `test.parquet` is a sample of train** (1,213 spectra, 400 molecules), so it cannot be used for validation. The hidden test has a different distribution (precursor m/z 245-460 here vs up to 1,159 Da hidden).
+
 ## Plan
 
 | Stage | What | Status |
